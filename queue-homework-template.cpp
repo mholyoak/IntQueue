@@ -18,17 +18,16 @@
 #include <mutex>
 
 //base queue interface
-template<class T>
 class IIntQueue
 {
 public:
     virtual ~IIntQueue() = default;
 
     // Add an item to the queue
-    virtual void Add(T item) = 0;
+    virtual void Add(int item) = 0;
 
     // Remove the first item and return it
-    virtual T Remove() = 0;
+    virtual int Remove() = 0;
 
     // return the count of items
     virtual int GetCount() = 0;
@@ -38,7 +37,7 @@ public:
 // prototypes
 //
 void TestQueueProc(void* lpParameter, int id);
-void TestQueue(IIntQueue<int> *pQueue);
+void TestQueue(IIntQueue *pQueue);
 
 
 // TODO
@@ -47,7 +46,7 @@ void TestQueue(IIntQueue<int> *pQueue);
 
 // Queue class implementation
 template<class T>
-class IntQueue : public IIntQueue<T>
+class IntQueue : public IIntQueue
 {
 public:
     IntQueue() 
@@ -126,7 +125,7 @@ public:
 
 struct TestQueueData
 {
-    IIntQueue<int>* pQueue;
+    IIntQueue* pQueue;
     int count;
     bool run;
 };
@@ -150,7 +149,7 @@ void  TestQueueProc( void * lpParameter, int id)
 
 }
 
-void TestQueue(IIntQueue<int> *pQueue)
+void TestQueue(IIntQueue *pQueue)
 {
     // create threads to update the queue
     
