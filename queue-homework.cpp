@@ -104,14 +104,8 @@ public:
 
     struct IntQueueItem
     {
-        IntQueueItem(){}
         IntQueueItem(int value) :
             _value(value)
-        {}
-
-        IntQueueItem(int value, std::shared_ptr<IntQueueItem>& tail):
-            _value(value),
-            _tail(tail)
         {}
 
         int _value;

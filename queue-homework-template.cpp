@@ -18,16 +18,17 @@
 #include <mutex>
 
 //base queue interface
-class IIntQueue
+template<class T>
+class IQueue
 {
 public:
-    virtual ~IIntQueue() = default;
+    virtual ~IQueue() = default;
 
     // Add an item to the queue
-    virtual void Add(int item) = 0;
+    virtual void Add(T item) = 0;
 
     // Remove the first item and return it
-    virtual int Remove() = 0;
+    virtual T Remove() = 0;
 
     // return the count of items
     virtual int GetCount() = 0;
@@ -37,7 +38,7 @@ public:
 // prototypes
 //
 void TestQueueProc(void* lpParameter, int id);
-void TestQueue(IIntQueue *pQueue);
+void TestQueue(IQueue<int> *pQueue);
 
 
 // TODO
@@ -46,10 +47,10 @@ void TestQueue(IIntQueue *pQueue);
 
 // Queue class implementation
 template<class T>
-class IntQueue : public IIntQueue
+class TemplateQueue : public IQueue<T>
 {
 public:
-    IntQueue() 
+    TemplateQueue()
     {
         _count = 0;
         _head = _tail;
@@ -105,7 +106,6 @@ public:
 
     struct IntQueueItem
     {
-        IntQueueItem(){}
         IntQueueItem(T value) :
             _value(value)
         {}
@@ -125,7 +125,7 @@ public:
 
 struct TestQueueData
 {
-    IIntQueue* pQueue;
+    IQueue<int>* pQueue;
     int count;
     bool run;
 };
@@ -149,7 +149,7 @@ void  TestQueueProc( void * lpParameter, int id)
 
 }
 
-void TestQueue(IIntQueue *pQueue)
+void TestQueue(IQueue<int> *pQueue)
 {
     // create threads to update the queue
     
@@ -205,11 +205,32 @@ void TestQueue(IIntQueue *pQueue)
 }
 
 
+void TestStrQueue(TemplateQueue<std::string>& strQueue)
+{
+    std::string firstItem("FirstItem");
+    std::string secondItem("SecondItem");
+
+    strQueue.Add(firstItem);
+    strQueue.Add(secondItem);
+
+    assert(strQueue.GetCount() == 2);
+    auto firstResult = strQueue.Remove();
+    assert (firstResult == firstItem);
+
+    auto secondResult = strQueue.Remove();
+    assert (secondResult == secondItem);
+
+    printf("String Queue dump:  count=%d  firstResult=%s  secondResult=%s\n", strQueue.GetCount(), firstResult.c_str(), secondResult.c_str());
+}
+
 int main(int argc, char** argv)
 {
     // Test the queue implementation 
-    IntQueue<int> queue1;
+    TemplateQueue<int> queue1;
     TestQueue(&queue1);
+
+    TemplateQueue<std::string> strQueue;
+    TestStrQueue(strQueue);
 
     return 0;
 }
