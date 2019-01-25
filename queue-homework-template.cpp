@@ -18,16 +18,17 @@
 #include <mutex>
 
 //base queue interface
+template<class T>
 class IIntQueue
 {
 public:
     virtual ~IIntQueue() = default;
 
     // Add an item to the queue
-    virtual void Add(int item) = 0;
+    virtual void Add(T item) = 0;
 
     // Remove the first item and return it
-    virtual int Remove() = 0;
+    virtual T Remove() = 0;
 
     // return the count of items
     virtual int GetCount() = 0;
@@ -37,15 +38,16 @@ public:
 // prototypes
 //
 void TestQueueProc(void* lpParameter, int id);
-void TestQueue(IIntQueue *pQueue);
+void TestQueue(IIntQueue<int> *pQueue);
 
 
 // TODO
 // Add the implementation to IntQueue class so the program can run without
 // any asserts
 
-// Queue class implementation 
-class IntQueue : public IIntQueue
+// Queue class implementation
+template<class T>
+class IntQueue : public IIntQueue<T>
 {
 public:
     IntQueue() 
@@ -54,7 +56,7 @@ public:
         _head = _tail;
     };
 
-    virtual void Add(int item) {
+    virtual void Add(T item) {
         std::unique_lock<std::mutex> lock(_mutex);
 
         auto newItem = std::make_shared<IntQueueItem>(item);
@@ -76,11 +78,11 @@ public:
         _count++;
     };
 
-    virtual int Remove()
+    virtual T Remove()
     {
         std::unique_lock<std::mutex> lock (_mutex);
 
-        int item = 0;
+        T item;
 
         assert(_head != nullptr);
         if (_head != nullptr)
@@ -105,16 +107,11 @@ public:
     struct IntQueueItem
     {
         IntQueueItem(){}
-        IntQueueItem(int value) :
+        IntQueueItem(T value) :
             _value(value)
         {}
 
-        IntQueueItem(int value, std::shared_ptr<IntQueueItem>& tail):
-            _value(value),
-            _tail(tail)
-        {}
-
-        int _value;
+        T _value;
         std::shared_ptr<IntQueueItem> _tail;
     };
 
@@ -129,7 +126,7 @@ public:
 
 struct TestQueueData
 {
-    IIntQueue* pQueue;
+    IIntQueue<int>* pQueue;
     int count;
     bool run;
 };
@@ -153,7 +150,7 @@ void  TestQueueProc( void * lpParameter, int id)
 
 }
 
-void TestQueue(IIntQueue *pQueue)
+void TestQueue(IIntQueue<int> *pQueue)
 {
     // create threads to update the queue
     
@@ -212,7 +209,7 @@ void TestQueue(IIntQueue *pQueue)
 int main(int argc, char** argv)
 {
     // Test the queue implementation 
-    IntQueue queue1;
+    IntQueue<int> queue1;
     TestQueue(&queue1);
 
     return 0;
